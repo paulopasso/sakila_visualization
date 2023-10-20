@@ -3,36 +3,38 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Replace 'username' and 'password' with your MySQL username and password
-engine = create_engine('mysql://username:password.@localhost/sakila')
+engine = create_engine('mysql://root:csc19454@localhost/sakila')
 query = """
-SELECT c.name AS category, COUNT(r.rental_id) AS rental_count
-FROM category c
-JOIN film_category fc ON c.category_id = fc.category_id
-JOIN film f ON fc.film_id = f.film_id
-JOIN inventory i ON f.film_id = i.film_id
-JOIN rental r ON i.inventory_id = r.inventory_id
-GROUP BY category;
+SELECT DISTINCT c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+WHERE fc.category_id = 8;
 """
 
-# Execute the SQL query and load the results into a pandas DataFrame
-rental_data = pd.read_sql(query, engine)
+import pandas as pd
+import matplotlib.pyplot as plt
 
+# Assuming you've executed the modified SQL query and stored the results in rental_data
 
 # Set the figure size
 plt.figure(figsize=(10, 6))
 
 # Create a bar chart
-plt.bar(rental_data['category'], rental_data['rental_count'])
+plt.bar(rental_data['first_name'] + ' ' + rental_data['last_name'], rental_data['rental_count'])
 
 # Customize the chart
-plt.title('Number of Rentals by Category')
-plt.xlabel('Category')
-plt.ylabel('Rental Count')
-plt.xticks(rotation=45)  # Rotate category labels for readability
+plt.title('Number of Movies Rented by Each Customer from Category 8')
+plt.xlabel('Customer Name')
+plt.ylabel('Number of Movies Rented')
+plt.xticks(rotation=45)  # Rotate customer names for readability
 
 # Display the chart
 plt.tight_layout()
 plt.show()
+
 
 query = """
 SELECT DATE(rental_date) AS rental_day, COUNT(rental_id) AS rental_count
